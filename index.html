@@ -81,12 +81,21 @@
       bottom: 14px;
       font-size: 0.75rem;
       color: rgba(178, 107, 255, 0.65);
-      text-decoration: none;
       letter-spacing: 0.06em;
       z-index: 2;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
     }
-    .rate-source:hover {
+    .rate-source a {
+      color: rgba(178, 107, 255, 0.65);
+      text-decoration: none;
+    }
+    .rate-source a:hover {
       color: #b26bff;
+    }
+    .rate-source span {
+      opacity: 0.6;
     }
     canvas {
       position: fixed;
@@ -107,18 +116,26 @@
       <p>conexion establecida...</p>
       <div class="times" id="times"></div>
       <div class="rate" id="rate">USD/MXN: --</div>
+      <div class="rate" id="btc">BTC: -- USD | -- MXN</div>
     </div>
   </div>
   <div class="scanline"></div>
-  <a class="rate-source" href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">
-    Rates By Exchange Rate API
-  </a>
+  <div class="rate-source">
+    <a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">
+      Rates By Exchange Rate API
+    </a>
+    <span>•</span>
+    <a href="https://www.coingecko.com/en/api" target="_blank" rel="noreferrer">
+      Price data by CoinGecko
+    </a>
+  </div>
 
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
     const timesEl = document.getElementById('times');
     const rateEl = document.getElementById('rate');
+    const btcEl = document.getElementById('btc');
 
     const letters = '0123456789+-=*/()[]{}<>^';
     let columns = 0;
@@ -188,6 +205,17 @@
 
     const rateUrl = 'https://open.er-api.com/v6/latest/USD';
     const rateLabel = 'USD/MXN';
+    const btcUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,mxn';
+    const btcUsdFormat = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 2,
+    });
+    const btcMxnFormat = new Intl.NumberFormat('es-MX', {
+      style: 'currency',
+      currency: 'MXN',
+      maximumFractionDigits: 2,
+    });
 
     const fetchRate = async () => {
       try {
@@ -208,6 +236,27 @@
 
     fetchRate();
     setInterval(fetchRate, 60 * 60 * 1000);
+
+    const fetchBtc = async () => {
+      try {
+        const response = await fetch(btcUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        const usd = data?.bitcoin?.usd;
+        const mxn = data?.bitcoin?.mxn;
+        if (typeof usd !== 'number' || typeof mxn !== 'number') {
+          throw new Error('Missing BTC rates');
+        }
+        btcEl.textContent = `BTC: ${btcUsdFormat.format(usd)} USD | ${btcMxnFormat.format(mxn)} MXN`;
+      } catch (error) {
+        btcEl.textContent = 'BTC: N/A';
+      }
+    };
+
+    fetchBtc();
+    setInterval(fetchBtc, 60 * 1000);
   </script>
 </body>
 </html>
