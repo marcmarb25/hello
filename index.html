@@ -6,8 +6,8 @@
   <title>Hello Mundo | Matrix</title>
   <style>
     :root {
-      --matrix-green: #00ff66;
-      --matrix-dark: #020b05;
+      --matrix-red: #ff2b2b;
+      --matrix-dark: #0b0202;
     }
     * {
       box-sizing: border-box;
@@ -16,7 +16,7 @@
       height: 100%;
       margin: 0;
       background: var(--matrix-dark);
-      color: var(--matrix-green);
+      color: var(--matrix-red);
       font-family: "Share Tech Mono", "Consolas", "Courier New", monospace;
       overflow: hidden;
     }
@@ -25,8 +25,8 @@
       inset: 0;
       background: repeating-linear-gradient(
         to bottom,
-        rgba(0, 255, 102, 0.05),
-        rgba(0, 255, 102, 0.05) 1px,
+        rgba(255, 43, 43, 0.05),
+        rgba(255, 43, 43, 0.05) 1px,
         rgba(0, 0, 0, 0.15) 2px,
         rgba(0, 0, 0, 0.15) 4px
       );
@@ -36,7 +36,7 @@
       animation: flicker 6s infinite;
     }
     .glow {
-      text-shadow: 0 0 6px rgba(0, 255, 102, 0.9), 0 0 18px rgba(0, 255, 102, 0.6);
+      text-shadow: 0 0 6px rgba(255, 43, 43, 0.9), 0 0 18px rgba(255, 43, 43, 0.6);
     }
     .center {
       position: fixed;
@@ -81,7 +81,7 @@
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
 
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+    const letters = '0123456789+-=*/()[]{}<>^';
     let columns = 0;
     let drops = [];
     let fontSize = 16;
@@ -95,10 +95,10 @@
     };
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(2, 11, 5, 0.12)';
+      ctx.fillStyle = 'rgba(11, 2, 2, 0.12)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#00ff66';
+      ctx.fillStyle = '#ff2b2b';
       ctx.font = `${fontSize}px Share Tech Mono, Consolas, monospace`;
 
       drops.forEach((y, i) => {
