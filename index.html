@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hello Mundo | Matrix</title>
+  <title>Hello Marcos | Matrix</title>
   <style>
     :root {
       --matrix-red: #ff2b2b;
-      --matrix-dark: #0b0202;
+      --matrix-green: #22ff66;
+      --matrix-dark: #021006;
     }
     * {
       box-sizing: border-box;
@@ -25,8 +26,8 @@
       inset: 0;
       background: repeating-linear-gradient(
         to bottom,
-        rgba(255, 43, 43, 0.05),
-        rgba(255, 43, 43, 0.05) 1px,
+        rgba(34, 255, 102, 0.05),
+        rgba(34, 255, 102, 0.05) 1px,
         rgba(0, 0, 0, 0.15) 2px,
         rgba(0, 0, 0, 0.15) 4px
       );
@@ -56,6 +57,15 @@
       font-size: clamp(0.9rem, 2vw, 1.25rem);
       opacity: 0.8;
     }
+    .times {
+      margin-top: 1.25rem;
+      font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      display: grid;
+      gap: 0.35rem;
+    }
     canvas {
       position: fixed;
       inset: 0;
@@ -71,8 +81,9 @@
   <canvas id="matrix"></canvas>
   <div class="center">
     <div class="glow">
-      <h1>HELLO MUNDO</h1>
+      <h1>HELLO MARCOS</h1>
       <p>conexion establecida...</p>
+      <div class="times" id="times"></div>
     </div>
   </div>
   <div class="scanline"></div>
@@ -80,11 +91,13 @@
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
+    const timesEl = document.getElementById('times');
 
     const letters = '0123456789+-=*/()[]{}<>^';
     let columns = 0;
     let drops = [];
     let fontSize = 16;
+    const speed = 0.6;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -95,10 +108,10 @@
     };
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(11, 2, 2, 0.12)';
+      ctx.fillStyle = 'rgba(2, 16, 6, 0.12)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#ff2b2b';
+      ctx.fillStyle = '#22ff66';
       ctx.font = `${fontSize}px Share Tech Mono, Consolas, monospace`;
 
       drops.forEach((y, i) => {
@@ -108,7 +121,7 @@
         if (y > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         } else {
-          drops[i] = y + fontSize;
+          drops[i] = y + fontSize * speed;
         }
       });
 
@@ -118,6 +131,33 @@
     window.addEventListener('resize', resize);
     resize();
     draw();
+
+    const zones = [
+      { label: 'Mexico', tz: 'America/Mexico_City' },
+      { label: 'Korea del Sur', tz: 'Asia/Seoul' },
+      { label: 'Espana', tz: 'Europe/Madrid' },
+    ];
+
+    const formatters = zones.map((zone) => ({
+      ...zone,
+      fmt: new Intl.DateTimeFormat('en-US', {
+        timeZone: zone.tz,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      }),
+    }));
+
+    const renderTimes = () => {
+      const now = new Date();
+      timesEl.innerHTML = formatters
+        .map(({ label, fmt }) => `<div>${label}: ${fmt.format(now)}</div>`)
+        .join('');
+    };
+
+    renderTimes();
+    setInterval(renderTimes, 1000);
   </script>
 </body>
 </html>
