@@ -66,6 +66,28 @@
       display: grid;
       gap: 0.35rem;
     }
+    .rate {
+      margin-top: 0.75rem;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: #b26bff;
+      text-shadow: 0 0 6px rgba(178, 107, 255, 0.7);
+      opacity: 0.95;
+    }
+    .rate-source {
+      position: fixed;
+      right: 18px;
+      bottom: 14px;
+      font-size: 0.75rem;
+      color: rgba(178, 107, 255, 0.65);
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      z-index: 2;
+    }
+    .rate-source:hover {
+      color: #b26bff;
+    }
     canvas {
       position: fixed;
       inset: 0;
@@ -84,14 +106,19 @@
       <h1>HELLO MARCOS</h1>
       <p>conexion establecida...</p>
       <div class="times" id="times"></div>
+      <div class="rate" id="rate">USD/MXN: --</div>
     </div>
   </div>
   <div class="scanline"></div>
+  <a class="rate-source" href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">
+    Rates By Exchange Rate API
+  </a>
 
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
     const timesEl = document.getElementById('times');
+    const rateEl = document.getElementById('rate');
 
     const letters = '0123456789+-=*/()[]{}<>^';
     let columns = 0;
@@ -158,6 +185,29 @@
 
     renderTimes();
     setInterval(renderTimes, 1000);
+
+    const rateUrl = 'https://open.er-api.com/v6/latest/USD';
+    const rateLabel = 'USD/MXN';
+
+    const fetchRate = async () => {
+      try {
+        const response = await fetch(rateUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        const rate = data?.rates?.MXN;
+        if (data?.result !== 'success' || typeof rate !== 'number') {
+          throw new Error('Missing MXN rate');
+        }
+        rateEl.textContent = `${rateLabel}: ${rate.toFixed(4)}`;
+      } catch (error) {
+        rateEl.textContent = `${rateLabel}: N/A`;
+      }
+    };
+
+    fetchRate();
+    setInterval(fetchRate, 60 * 60 * 1000);
   </script>
 </body>
 </html>
