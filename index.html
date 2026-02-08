@@ -1,0 +1,123 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hello Mundo | Matrix</title>
+  <style>
+    :root {
+      --matrix-green: #00ff66;
+      --matrix-dark: #020b05;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--matrix-dark);
+      color: var(--matrix-green);
+      font-family: "Share Tech Mono", "Consolas", "Courier New", monospace;
+      overflow: hidden;
+    }
+    .scanline {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0, 255, 102, 0.05),
+        rgba(0, 255, 102, 0.05) 1px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      );
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: 0.5;
+      animation: flicker 6s infinite;
+    }
+    .glow {
+      text-shadow: 0 0 6px rgba(0, 255, 102, 0.9), 0 0 18px rgba(0, 255, 102, 0.6);
+    }
+    .center {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      pointer-events: none;
+    }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 6rem);
+      letter-spacing: 0.18em;
+      margin: 0;
+    }
+    p {
+      margin: 0.5rem 0 0;
+      font-size: clamp(0.9rem, 2vw, 1.25rem);
+      opacity: 0.8;
+    }
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 0.45; }
+      50% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div class="center">
+    <div class="glow">
+      <h1>HELLO MUNDO</h1>
+      <p>conexion establecida...</p>
+    </div>
+  </div>
+  <div class="scanline"></div>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+    let columns = 0;
+    let drops = [];
+    let fontSize = 16;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      fontSize = Math.max(14, Math.floor(window.innerWidth / 120));
+      columns = Math.floor(canvas.width / fontSize);
+      drops = Array.from({ length: columns }, () => Math.floor(Math.random() * canvas.height));
+    };
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(2, 11, 5, 0.12)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00ff66';
+      ctx.font = `${fontSize}px Share Tech Mono, Consolas, monospace`;
+
+      drops.forEach((y, i) => {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        const x = i * fontSize;
+        ctx.fillText(text, x, y);
+        if (y > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        } else {
+          drops[i] = y + fontSize;
+        }
+      });
+
+      requestAnimationFrame(draw);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+  </script>
+</body>
+</html>
